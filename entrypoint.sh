@@ -53,7 +53,7 @@ echo "  CPU_THREADS: $CPU_THREADS"
 echo "================================================"
 echo ""
 
-exec /usr/local/bin/SRBMiner-MULTI \
+/usr/local/bin/SRBMiner-MULTI \
     --algorithm-cpu randomx \
     --pool "$SAL_POOL" \
     --wallet "$SAL_WALLET" \
@@ -62,4 +62,9 @@ exec /usr/local/bin/SRBMiner-MULTI \
     --algorithm-gpu pearlhash \
     --pool "$PRL_POOL" \
     --wallet "$PRL_WALLET" \
-    --worker "$PRL_WORKER"
+    --worker "$PRL_WORKER" 2>&1
+
+EXIT_CODE=$?
+echo ""
+echo "❌ SRBMiner berhenti dengan exit code: $EXIT_CODE"
+exit $EXIT_CODE
