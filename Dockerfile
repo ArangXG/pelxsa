@@ -17,6 +17,6 @@ RUN chmod +x /usr/local/bin/SRBMiner-MULTI /usr/local/bin/entrypoint.sh
 # ── GPU Mining · PearlHash · Pearl ───────────────────────────
 ENV PRL_POOL=
 ENV PRL_WALLET=
-ENV PRL_WORKER=worker
+ENV PRL_WORKER=
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
