@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "================================================"
-echo "  SRBMiner-MULTI Startup Check"
+echo "  SRBMiner-MULTI · Pearlhash Startup Check"
 echo "================================================"
 
 # Check NVIDIA driver version
@@ -21,14 +21,6 @@ fi
 
 # Validate required ENVs
 MISSING=0
-if [ -z "$SAL_WALLET" ]; then
-    echo "❌ SAL_WALLET belum diisi!"
-    MISSING=1
-fi
-if [ -z "$SAL_POOL" ]; then
-    echo "❌ SAL_POOL belum diisi!"
-    MISSING=1
-fi
 if [ -z "$PRL_WALLET" ]; then
     echo "❌ PRL_WALLET belum diisi!"
     MISSING=1
@@ -45,21 +37,14 @@ if [ "$MISSING" -eq 1 ]; then
 fi
 
 echo ""
-echo "  SAL_POOL   : $SAL_POOL"
-echo "  SAL_WORKER : $SAL_WORKER"
 echo "  PRL_POOL   : $PRL_POOL"
 echo "  PRL_WORKER : $PRL_WORKER"
-echo "  CPU_THREADS: $CPU_THREADS"
 echo "================================================"
 echo ""
 
 /usr/local/bin/SRBMiner-MULTI \
-    --algorithm-cpu randomx \
-    --pool "$SAL_POOL" \
-    --wallet "$SAL_WALLET" \
-    --worker "$SAL_WORKER" \
-    --cpu-threads "$CPU_THREADS" \
-    --algorithm-gpu pearlhash \
+    --disable-cpu \
+    --algorithm pearlhash \
     --pool "$PRL_POOL" \
     --wallet "$PRL_WALLET" \
     --worker "$PRL_WORKER" 2>&1
