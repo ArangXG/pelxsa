@@ -36,9 +36,18 @@ if [ "$MISSING" -eq 1 ]; then
     exit 1
 fi
 
+# Gabungkan wallet + worker jadi satu string "wallet.worker"
+# karena SRBMiner-MULTI untuk pearlhash pakai format ini, bukan flag --worker terpisah
+if [ -n "$PRL_WORKER" ]; then
+    FULL_WALLET="${PRL_WALLET}.${PRL_WORKER}"
+else
+    FULL_WALLET="$PRL_WALLET"
+fi
+
 echo ""
 echo "  PRL_POOL   : $PRL_POOL"
 echo "  PRL_WORKER : $PRL_WORKER"
+echo "  WALLET     : $FULL_WALLET"
 echo "================================================"
 echo ""
 
@@ -46,8 +55,7 @@ echo ""
     --disable-cpu \
     --algorithm pearlhash \
     --pool "$PRL_POOL" \
-    --wallet "$PRL_WALLET" \
-    --worker "$PRL_WORKER" 2>&1
+    --wallet "$FULL_WALLET" 2>&1
 
 EXIT_CODE=$?
 echo ""
