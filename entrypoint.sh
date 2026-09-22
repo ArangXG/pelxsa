@@ -51,13 +51,17 @@ echo "  WALLET     : $FULL_WALLET"
 echo "================================================"
 echo ""
 
-/usr/local/bin/SRBMiner-MULTI \
-    --disable-cpu \
-    --algorithm pearlhash \
-    --pool "$PRL_POOL" \
-    --wallet "$FULL_WALLET" 2>&1
+# ── Loop: jalankan miner, auto-restart kalau crash ──
+while true; do
+    /usr/local/bin/SRBMiner-MULTI \
+        --disable-cpu \
+        --algorithm pearlhash \
+        --pool "$PRL_POOL" \
+        --wallet "$FULL_WALLET" 2>&1
 
-EXIT_CODE=$?
-echo ""
-echo "❌ SRBMiner berhenti dengan exit code: $EXIT_CODE"
-exit $EXIT_CODE
+    EXIT_CODE=$?
+    echo ""
+    echo "❌ SRBMiner berhenti dengan exit code: $EXIT_CODE"
+    echo "🔁 Restart miner dalam 5 detik..."
+    sleep 5
+done
