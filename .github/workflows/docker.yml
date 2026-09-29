@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: '0 6 * * *'   # tiap hari jam 06:00 UTC, cek update SRBMiner-MULTI terbaru
+    - cron: '0 */6 * * *'   # tiap 6 jam, cek update SRBMiner-MULTI terbaru
   workflow_dispatch: {}    # bisa dipicu manual dari tab Actions kalau mau cek sekarang
 
 permissions:
