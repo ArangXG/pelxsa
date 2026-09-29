@@ -7,8 +7,44 @@ on:
     - cron: '0 6 * * *'   # tiap hari jam 06:00 UTC, cek update SRBMiner-MULTI terbaru
   workflow_dispatch: {}    # bisa dipicu manual dari tab Actions kalau mau cek sekarang
 
+permissions:
+  contents: write   # perlu buat commit balik file .srbminer_version
+
 jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      latest_version: ${{ steps.check.outputs.latest_version }}
+      should_build: ${{ steps.check.outputs.should_build }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cek versi SRBMiner-MULTI terbaru
+        id: check
+        run: |
+          LATEST=$(curl -s https://api.github.com/repos/doktor83/SRBMiner-Multi/releases/latest \
+            | grep -m1 '"tag_name"' \
+            | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
+          echo "Versi terbaru di GitHub : $LATEST"
+
+          CURRENT=""
+          if [ -f .srbminer_version ]; then
+            CURRENT=$(cat .srbminer_version)
+          fi
+          echo "Versi tercatat terakhir : ${CURRENT:-(belum ada)}"
+
+          echo "latest_version=$LATEST" >> "$GITHUB_OUTPUT"
+
+          if [ "$LATEST" != "$CURRENT" ] || [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "should_build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_build=false" >> "$GITHUB_OUTPUT"
+            echo "⏭️  Versi sama dan ini run terjadwal, build di-skip."
+          fi
+
   build:
+    needs: check-version
+    if: needs.check-version.outputs.should_build == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +61,16 @@ jobs:
           context: .
           push: true
           build-args: |
-            CACHEBUST=${{ github.run_id }}
+            SRB_VERSION=${{ needs.check-version.outputs.latest_version }}
           tags: |
             tarxg/prlxsal:latest
-            tarxg/prlxsal:v1
+            tarxg/prlxsal:${{ needs.check-version.outputs.latest_version }}
+
+      - name: Catat versi terbaru
+        run: echo "${{ needs.check-version.outputs.latest_version }}" > .srbminer_version
+
+      - name: Commit versi terbaru
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update SRBMiner-MULTI ke ${{ needs.check-version.outputs.latest_version }}"
+          file_pattern: .srbminer_version
